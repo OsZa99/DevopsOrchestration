@@ -6,6 +6,8 @@ Ce dépôt contient une orchestration Docker Compose pour un écosystème d'appl
 ## Architecture
 L'architecture est composée de plusieurs conteneurs Docker interconnectés qui fonctionnent ensemble pour créer un environnement d'application complet :
 
+![Diagramme d'Architecture](media/Architecture.png)
+
 ### Composants Clés :
 - **Applications Spring Boot** (v1 et v2) : Deux versions d'une API REST pour la gestion des personnes
 - **Base de données MySQL** : Stocke les données de l'application avec initialisation automatique
