@@ -1,18 +1,16 @@
-version: "3.8"
-
 services:
   spring-app-v1:
     build:
       context: .
       dockerfile: Dockerfile
-    image: devops-application-v1:latest
+    image: spring-app-v1:latest
     container_name: spring-app-v1
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/test?serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${DB_NAME}?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       APP_VERSION: v1
-      APP_USER: User1
+      APP_USER: Ossama
     depends_on:
       - mysql-db
     networks:
@@ -22,14 +20,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: devops-application-v2:latest
+    image: spring-app-v2:latest
     container_name: spring-app-v2
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/test?serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${DB_NAME}?serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       APP_VERSION: v2
-      APP_USER: User2
+      APP_USER: Zarani
     depends_on:
       - mysql-db
     networks:
@@ -54,8 +52,8 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     volumes:
       - mysql_data:/var/lib/mysql
       - ./database/monannuaire_mysql.sql:/docker-entrypoint-initdb.d/monannuaire_mysql.sql
@@ -68,8 +66,8 @@ services:
     volumes:
       - ./backups:/backups
     entrypoint: >
-      /bin/sh -c "while true; do
-      mysqldump -h mysql-db -u root -proot test > /backups/dump-$(date +%F-%H-%M).sql;
+      /bin/sh -c "sleep 20; while true; do
+      mysqldump -h mysql-db -u ${DB_USER} -p${DB_PASSWORD} ${DB_NAME} > /backups/dump-$(date +%F-%H-%M).sql;
       sleep 43200;
       done"
     depends_on:
@@ -84,7 +82,7 @@ services:
       - "8080:80"
     environment:
       PMA_HOST: mysql-db
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
     depends_on:
       - mysql-db
     networks:
