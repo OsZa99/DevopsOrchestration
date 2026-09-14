@@ -5,8 +5,10 @@ RUN mvn dependency:go-offline -B
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
+RUN adduser -D -S spring
+USER spring
 COPY --from=build /app/target/devops-1.0.jar app.jar
 EXPOSE 10000
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
