@@ -31,6 +31,8 @@ jobs:
         run: |
           mvn sonar:sonar \
             -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.organization=osza99-organisation \
+            -Dsonar.projectKey=OsZa99_devsecops-pipeline-spring-docker \
             -Dsonar.token=$SONAR_TOKEN
 
       - name: Sauvegarder les rapports de tests
