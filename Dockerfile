@@ -10,6 +10,6 @@ WORKDIR /app
 RUN apk update && apk upgrade --no-cache
 RUN adduser -D -S spring
 USER spring
-COPY --from=build /app/target/devops-1.0.jar app.jar
+COPY --from=build /app/target/app.jar app.jar
 EXPOSE 10000
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
