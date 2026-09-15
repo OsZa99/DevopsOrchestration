@@ -12,8 +12,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/version")
 public class VersionController {
-    @Autowired
+    
     private Environment environment;
+
+    public VersionController(Environment environment) {
+        this.environment = environment;
+    }
 
     @GetMapping
     public Map<String, String> getVersionInfo() {

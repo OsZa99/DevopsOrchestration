@@ -14,8 +14,13 @@ import java.util.List;
 @RestController
 @RequestMapping("api/persons")
 public class PersonController {
-    @Autowired
+
+    
     private PersonRepository personRepo;
+
+    public PersonController(PersonRepository personRepo) {
+        this.personRepo = personRepo;
+    }
     
     @GetMapping
     public Iterable<Person> getPersons(){
