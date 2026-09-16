@@ -37,7 +37,7 @@ jobs:
 
       - name: Sauvegarder les rapports de tests
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: rapports-tests-surefire
           path: target/surefire-reports/
@@ -86,6 +86,12 @@ jobs:
       - name: Cloner le projet
         uses: actions/checkout@v7
 
+      - name: Générer le fichier .env
+        run: |
+          echo "DB_NAME=${{ secrets.DB_NAME }}" > .env
+          echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+
       - name: Copier les fichiers sur le serveur AWS
         uses: appleboy/scp-action@v1
         with:
@@ -93,7 +99,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
-          source: "docker-compose.yaml,nginx.conf,database/"
+          source: "docker-compose.yaml,nginx.conf,database/,.env"
           target: "/home/ubuntu/devops-app"
 
       - name: Lancer l'application sur le serveur AWS
@@ -104,7 +110,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: ${{ secrets.EC2_SSH_PORT }}
           script: |
-            cd /home/ubuntu/devops-app            
+            cd /home/ubuntu/devops-app
+            chmod 600 .env
             docker compose pull            
             docker compose up -d --remove-orphans
 
