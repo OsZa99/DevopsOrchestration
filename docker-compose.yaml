@@ -1,9 +1,6 @@
 services:
   spring-app-v1:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: spring-app-v1:latest
+    image: osza/devops-app:latest
     container_name: spring-app-v1
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${DB_NAME}?serverTimezone=UTC
@@ -17,10 +14,7 @@ services:
       - app-network
 
   spring-app-v2:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: spring-app-v2:latest
+    image: osza/devops-app:latest
     container_name: spring-app-v2
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/${DB_NAME}?serverTimezone=UTC
@@ -34,7 +28,7 @@ services:
       - app-network
 
   nginx:
-    image: nginx:latest
+    image: nginx:1.30-alpine
     container_name: nginx-reverse-proxy
     ports:
       - "80:80"
@@ -76,7 +70,7 @@ services:
       - app-network
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
+    image: phpmyadmin:5.2-apache
     container_name: phpmyadmin
     ports:
       - "8080:80"

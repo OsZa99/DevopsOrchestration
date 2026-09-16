@@ -11,12 +11,12 @@ jobs:
 
     steps:
       - name: Cloner le projet
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Installer Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -49,10 +49,10 @@ jobs:
 
     steps:
       - name: Cloner le projet
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Se connecter à Docker Hub
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -64,7 +64,7 @@ jobs:
             -t ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:${{ github.sha }} .
 
       - name: Scanner l'image avec Trivy 
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest 
           format: 'table'
@@ -77,6 +77,36 @@ jobs:
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/devops-app:${{ github.sha }}
 
+  deploy-to-aws:
+    name: Deploy to AWS EC2
+    runs-on: ubuntu-latest
+    needs: build-and-test
+
+    steps:
+      - name: Cloner le projet
+        uses: actions/checkout@v7
+
+      - name: Copier les fichiers sur le serveur AWS
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          source: "docker-compose.yaml,nginx.conf,database/"
+          target: "/home/ubuntu/devops-app"
+
+      - name: Lancer l'application sur le serveur AWS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          script: |
+            cd /home/ubuntu/devops-app            
+            docker compose pull            
+            docker compose up -d --remove-orphans
 
 
 
